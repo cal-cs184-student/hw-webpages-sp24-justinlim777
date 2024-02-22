@@ -1,7 +1,174 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 1 index.html here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<title>CS 184/284A Rasterizer</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184/284A: Computer Graphics and Imaging, Spring 2024</h1>
+<h1 align="middle">Homework 1: Rasterizer</h1>
+<h2 align="middle">YOUR NAME</h2>
+
+<br><br>
+
+    <div>
+
+        <h2 align="middle">Overview</h2>
+        <p>
+            This was a great homework that had taught me alot about computer graphics. Specifically, this homework had helped me up my knowledge
+            in rasterization, interpolation, and different sampling techniques. What was intersting was the simple amount of math that goes into these techniques.
+            I had first expected the level of math to be some niche and tricky linear algebra, but it came out to be pretty fun and simple. Loved seeing my images
+            becomming increasingly refined throughout implementing several different sampling techniques and was nice seeing the differences between all of them.
+        </p>
+
+        <h2 align="middle">Section I: Rasterization</h2>
+        <h3 align="middle">Part 1: Rasterizing single-color triangles</h3>
+        <p>
+            To rasterize my triangles, you will first need to calculate the bounds (of where we want to look). Simply, we can just take the maximum of the 3 coordinates of the edges of the triangles, both x and y respectively. This put into a for loop should give us the range of where we want to look. We can start at 0, but it is more efficient to also find the min of these coordinates for the same reason.
+            Once we have these bounds, we can simply use the formula from lecture to tell us whether or not a point is in the triangle. This check is done using barycentric coordinates, a system that represents a point within a triangle in terms of the triangle's vertices.
+            If it is in the triangle, we are ready to fill in the pixel with whatever chosen color.
+            Now, we also have to account for the edges and points. This can be done the same way but with a much simpler formula for finding wheter or not the point is on.
+        </p>
+        <p>
+            By starting at the minimum and capping at the maximum points, we are essentially checking within the bounding box of the triangle. Instead of checking every pixel in the bounding box, I employ a more selective approach. By using barycentric coordinates, the algorithm quickly determines whether a pixel is inside the triangle. This method significantly reduces the number of unnecessary checks, especially near the edges of the bounding box where many pixels may not be part of the triangle.
+        </p>
+        <td>
+            <img src="images/image13.png" align="middle" width="400px" />
+            <figcaption align="middle">png screenshot of basic/test4.svg with the default viewing parameters and with the pixel inspector centered on an interesting part of the scene.</figcaption>
+        </td>
+
+
+
+        <h3 align="middle">Part 2: Antialiasing triangles</h3>
+
+        <p>
+            Supersampling is a technique used in computer graphics to improve image quality by reducing aliasing artifacts. Aliasing often manifests as jagged edges or "jaggies" on diagonal lines and curves. My implementation of supersampling addresses these issues by sampling each pixel multiple times at different positions and averaging the results to produce the final color.
+            For supersampling, we can build off our rasterization function. Some new parameters we need to account for are the extra sampling within each pixel. We use x + (i + 0.5) / samples_per_pixel to find each supersample point. To accommodate multiple samples per pixel, I modified the data structure that stores pixel colors. Instead of storing a single color value per pixel, it now stores multiple color values corresponding to each sample within the pixel.
+            As we need to use samples per pixel, and the fact that we also want to determine our own rates, we need to resize the samplebuffer accordingly. Simply multiply with new sample rate. I increased the number of samples per pixel. Instead of taking just one color sample at the center of each pixel, I take multiple samples within each pixel. For instance, with a sample rate of 4, I would take four samples per pixel.
+            As we are essentially using a new buffer, we also need to redefine our resolve to frame buffer function to boot up our new values. After computing colors for each sample within a pixel, these colors are averaged to determine the final color of the pixel. This averaging smooths out the variations and reduces the sharp edges that cause aliasing.
+        </p>
+        <td>
+            <img src="images/image4.png" align="middle" width="400px" />
+            <figcaption align="middle">Sample rate: 1</figcaption>
+        </td>
+        <td>
+            <img src="images/image2.png" align="middle" width="400px" />
+            <figcaption align="middle">Sample rate: 4</figcaption>
+        </td>
+        <td>
+            <img src="images/image1.png" align="middle" width="400px" />
+            <figcaption align="middle">Sample rate: 16</figcaption>
+        </td>
+        
+        <p>
+            By increasing the sample rate, we are able to see changes in between these images highlight the effectiveness of supersampling. At higher sample rates, the edges of triangles become smoother, and the overall image appears more refined. The impact is most noticeable in areas with high contrast or small, detailed features.
+        </p>
+
+        <h3 align="middle">Part 3: Transforms</h3>
+
+        <td>
+            <img src="images/image8.png" align="middle" width="400px" />
+            <figcaption align="middle">Made the robot wave! Needed to rotate and set his arm down to correct length of shoulder. The same for the raised arm. Done by adding rotation and transformation shifts to both the sections regarding his arms.</figcaption>
+        </td>
+
+        <h2 align="middle">Section II: Sampling</h2>
+
+
+
+        <h3 align="middle">Part 4: Barycentric coordinates</h3>
+        <p>
+            Barycentric coordinates provide a way to express a point within a triangle relative to the triangle's vertices. They have weights assigned to the vertices of a triangle, indicating some influence of each vertex on a specific point. These could be sued for easy interpolation of values across the surface of a triangle.
+            - As you move across the triangle, the colors blend smoothly according to the influence of each vertex's color.
+        </p>
+        <td>
+            <img src="images/image14.png" align="middle" width="400px" />
+            <figcaption align="middle">This is a visual representation of how barycentric coordinates interpolate values across the triangle using test 7. As we can see, the blue is smoothly transitioned form light to darker.</figcaption>
+        </td>
+
+        <h3 align="middle">Part 5: "Pixel sampling" for texture mapping</h3>
+        <p>
+            -Pixel sampling is a technique in computer graphics that determines how texture information is mapped onto rasterized shapes. In texture mapping, pixel sampling determines how textures are displayed when magnified or minified relative to their original resolution.
+            -To implement it to perform texture mapping, I first modified the rasterize_triangle function to include the two different sampling methods available: Nearest-Neightbor Samping, and Bilinear Sampling.
+            -Ignoring the mipmap levels, to sample nearest, we first have to calculate the UV coordinates to texture space (rounded and scaled according to resolution) and clamp them (so we do not go out of bounds).
+            -Once this is done, we retrieve the texture with get_texel function using the coordinates we just refined.
+            - As for bilinear sampling, the method takes an interpolated color value from the four nearest texels surrounding a given texture coordinate. This smoothing effect reduces the blockiness and creates a more visually appealing image at various scales.
+            -To implement this, as per lecture, we first scale the uv coordinates and find 4 nearest texels (floor, and add 1). With these texels, we compute horizontal and vertical distances from the point we are sampling to the rest of the samples. These distances are used as weights for the interpolation. Next, we grab the colors for these 4 neighboring texels, then perform a linear interpolation along the x-axis. Then we do a second linear interpolation along the y-axis. Both these calculations use the weights we had calculated earlier.
+        </p>
+        <td>
+            <img src="images/image10.png" align="middle" width="400px" />
+            <figcaption align="middle">SR 1, Nearest</figcaption>
+        </td>
+        <td>
+            <img src="images/image6.png" align="middle" width="400px" />
+            <figcaption align="middle">SR 16, Nearest</figcaption>
+        </td>
+        <td>
+            <img src="images/image3.png" align="middle" width="400px" />
+            <figcaption align="middle">SR 1, Bilinear</figcaption>
+        </td>
+        <td>
+            <img src="images/image12.png" align="middle" width="400px" />
+            <figcaption align="middle">SR 16, Bilinear</figcaption>
+        </td>
+
+
+        <h3 align="middle">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
+
+        <p>
+            Level sampling in texture mapping is a technique used to determine which level of a mipmap to sample from when rendering a textured object. A mipmap is a sequence of textures, each of which is a progressively lower resolution representation of the original image. Level sampling helps to minimize visual artifacts such as aliasing and moiré patterns, especially when textures are viewed at a distance or at a shallow angle.
+            In my implementation, we utilize previously created sampling methods, nearest neighbor, and bilinear. The bulk of this implementation lies within finding the correct mipmap level which takes into account bayocentric coordinates. To get these coordinates, we first calculate the necessary UV coordinates within rasterize_triangle. These coordinates are then input to our get_level function where we calculate the rest:
+            Change in UV coordinates across a pixel -> scale these coordinates -> use the Dlog2(L) formulate to calculate the correct level -> clamp -> return final D.
+            To use this get_level, we implement our overarching sample function. This function will then determine what sampling method to use given LSM and PSM. Our three cases of L_ZERO, L_NEAREST, L_LINER, represents choosing between lvl 0, nearest level, or trilinear interpolation.
+            L_ZERO simple inputs our uv coordinates into the sampling functions.
+            L_NEAREST is the first instance where we utilize our miplevel function. We find the nearest level instead of 0.
+            To use this level, we simply grab the correct level, then utilize the mip to scale our coordinates.
+            L_LINEAR is where we start integrating trilinear interpolation: to do so, we essentially double our bilinear interpolation, we find the texels of the floor and ceiling levels through bilinear sampling. We then interpolate these texel colors to get the final texel result.
+        </p>
+        <p>
+            - Pixel sampling is genrerall the fastest, super sampling the slowerst, and level sampling in between. The difference in speed just refers to the amount of calculations that goes inbetween finding the pixel, rasterization, then finding the correct color/texel.
+            -Pixel sampling is the most memory-efficient for textures, while supersampling requires more frame buffer memory.Level sampling requires storing multiple mipmap levels which results in the most memory used.
+            Antialiaing Power: Pixel sampling, despite it’s efficiency, has the worst power amongst the three. Supersampling is the best in terms of cost efficiency, but Level sampling provides the best results.
+        </p>
+
+        <td>
+            <img src="images/image7.png" align="middle" width="400px" />
+            <figcaption align="middle">L_ZERO, P_NEAREST</figcaption>
+        </td>
+        <td>
+            <img src="images/image5.png" align="middle" width="400px" />
+            <figcaption align="middle">L_ZERO, P_LINEAR</figcaption>
+        </td>
+        <td>
+            <img src="images/image9.png" align="middle" width="400px" />
+            <figcaption align="middle">L_NEAREST, P_NEAREST</figcaption>
+        </td>
+        <td>
+            <img src="images/image11.png" align="middle" width="400px" />
+            <figcaption align="middle">L_NEARRST, P_LINEAR</figcaption>
+        </td>
+
+        <h2 align="middle">Section III: Art Competition</h2>
+        <p>If you are not participating in the optional art competition, don't worry about this section!</p>
+
+        <h3 align="middle">Part 7: Draw something interesting!</h3>
+
+    </div></body>
 </html>
