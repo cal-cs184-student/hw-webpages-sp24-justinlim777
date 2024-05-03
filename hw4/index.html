@@ -1,7 +1,231 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Homework 4 index.html here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<title>CS 184 Mesh Editor</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2017</h1>
+<h1 align="middle">Project 4: Cloth Simulator</h1>
+<h2 align="middle">JUSTIN LIM, CS184-??</h2>
+
+<br><br>
+
+    <div>
+
+        <h2 align="middle">Overview</h2>
+        <p>Give a high-level overview of what you implemented in this project. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the project.</p>
+        <p>
+            Another great project. This time we are focusing on actual physical mechanics of graphics. We go through simulating a cloth and various properties of this cloth
+            such as it's own functional properties, such as how fluid/fast it moves. We start off from the very basic framework of it's coordinate system, all the way to developing complex
+            collision properties. There was an entire second part where we touched upon giving this cloth a shading attribute. Was overall very fun and interative!
+        </p>
+        <h2 align="middle">Part I: Masses and springs</h2>
+
+        <h3>
+            Take some screenshots of scene/pinned2.json from a viewing angle where you can clearly see the cloth wireframe to show the structure of your point masses and springs.
+        </h3>
+        <td>
+            <img src="images/image21.png" align="middle" width="400px" />
+            <figcaption>Full cloth pic</figcaption>
+        </td>
+        <h3>Show us what the wireframe looks like (1) without any shearing constraints, (2) with only shearing constraints, and (3) with all constraints.</h3>
+        <!-- Example of including multiple figures -->
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="images/image5.png" align="middle" width="400px" />
+                        <figcaption>without any shearing constraints</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/image1.png" align="middle" width="400px" />
+                        <figcaption>with only shearing constraints</figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="images/image14.png" align="middle" width="400px" />
+                        <figcaption>(3) with all constraints</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <h3>
+            Experiment with some the parameters in the simulation. To do so, pause the simulation at the start with P, modify the values of interest, and then resume by pressing P again. You can also restart the simulation at any time from the cloth's starting position by pressing R.
+            Describe the effects of changing the spring constant ks; how does the cloth behave from start to rest with a very low ks? A high ks?
+            The spring constant controls how tight the fabric is. Lower ks values make the fabric much more elastic whereas higher ks values make the fabric more firm.
+        </h3>
+        <!-- Example of including multiple figures -->
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="images/image15.png" align="middle" width="400px" />
+                        <figcaption>Low Ks</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/image13.png" align="middle" width="400px" />
+                        <figcaption>high KS</figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+
+                    <h3>
+                        What about for density?
+                        Changing the density is a bit like changing the spring constant. Increases in density thickens the fabric, making it harder to sag whereas lower density allows the fabric to loosely hang. This is due to the increase of weight on the point masses.
+                    </h3>
+                    <td>
+                        <img src="images/image16.png" align="middle" width="400px" />
+                        <figcaption>low density</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/image6.png" align="middle" width="400px" />
+                        <figcaption>high density</figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <h3>
+                        What about for damping?
+                        Modifying the damping parameter changes the cloth’s ‘speed’, allowing it to move either much faster or slower. Lower damping values display a much more reactive cloth whereas a higher damping value makes it much ‘slower’, much like what we see of Superman’s cape as he descends slowly and menacingly.
+                    </h3>
+                    <td>
+                        <img src="images/image4.png" align="middle" width="400px" />
+                        <figcaption>Low damp</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/image22.png" align="middle" width="400px" />
+                        <figcaption>high damp</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+
+        <h3>
+            For each of the above, observe any noticeable differences in the cloth compared to the default parameters and show us some screenshots of those interesting differences and describe when they occur.
+            Show us a screenshot of your shaded cloth from scene/pinned4.json in its final resting state! If you choose to use different parameters than the default ones, please list them.
+        </h3>
+
+        <td>
+            <img src="images/image10.png" align="middle" width="400px" />
+            <figcaption>pinned4 green</figcaption>
+        </td>
+
+        <h3>
+            Part 3 Deliverables
+            Show us screenshots of your shaded cloth from scene/sphere.json in its final resting state on the sphere using the default ks = 5000 as well as with ks = 500 and ks = 50000. Describe the differences in the results.
+        </h3>
+        <h3>Using different ks values has different interactions with the sphere. I notice that the lower the ks value the more ‘loose/thin’ the cloth is while higher ks values make the cloth more ‘tight/thick’. Reminds me of something like a silk cloth versus my old used towel. </h3>
+        <!-- Example of including multiple figures -->
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="images/image17.png" align="middle" width="400px" />
+                        <figcaption>1</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/image3.png" align="middle" width="400px" />
+                        <figcaption>2</figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="images/image20.png" align="middle" width="400px" />
+                        <figcaption>3</figcaption>
+                    </td>
+
+                </tr>
+
+            </table>
+        </div>
+        <h3>
+            Show us a screenshot of your shaded cloth lying peacefully at rest on the plane. If you haven't by now, feel free to express your colorful creativity with the cloth! (You will need to complete the shaders portion first to show custom colors.)
+        </h3>
+        <td>
+            <img src="images/image7.png" align="middle" width="400px" />
+            <figcaption>Lying flat!</figcaption>
+        </td>
+        <h3>
+            Part 4 Deliverables
+            Show us at least 3 screenshots that document how your cloth falls and folds on itself, starting with an early, initial self-collision and ending with the cloth at a more restful state (even if it is still slightly bouncy on the ground).
+        </h3>
+        <td>
+            <img src="images/image11.png" align="middle" width="400px" />
+            <figcaption>Init</figcaption>
+        </td>
+        <td>
+            <img src="images/image26.png" align="middle" width="400px" />
+            <figcaption>Falling</figcaption>
+        </td>
+        <td>
+            <img src="images/image23.png" align="middle" width="400px" />
+            <figcaption>Final</figcaption>
+        </td>
+        <h3>Vary the density as well as ks and describe with words and screenshots how they affect the behavior of the cloth as it falls on itself.</h3>
+        <td>
+            <img src="images/image12.png" align="middle" width="400px" />
+            <figcaption>KS Low</figcaption>
+        </td>
+        <td>
+            <img src="images/image19.png" align="middle" width="400px" />
+            <figcaption>KS high</figcaption>
+        </td>
+        <td>
+            <img src="images/image2.png" align="middle" width="400px" />
+            <figcaption>Density low</figcaption>
+        </td>
+        <td>
+            <img src="images/image25.png" align="middle" width="400px" />
+            <figcaption>Density high</figcaption>
+        </td>
+        <p>
+            Part 5 Deliverables
+            Explain in your own words what is a shader program and how vertex and fragment shaders work together to create lighting and material effects.
+        </p>
+        <p>
+            A shader program executes on the GPU. It is primarily used to handle rendering effects on a per-pixel basis during real-time applications.
+            There are 2 Parts to a shader, the vertex shader, and the fragment shader. The vertex shader processes each verte of a 3D object then transforms these vertex coordinates from object space into screen space. It outputs final positon of each vertex in screen, while
+            also passing on data such as color, and texture coordiantes. The seocnd part, fragment Shaders deal with processes that actually determines the color and other attributes of each  pixel. Fragements are gerneated and outputs the color and depth of each pixel.
+        </p>
+        <p>Explain the Blinn-Phong shading model in your own words. Show a screenshot of your Blinn-Phong shader outputting only the ambient component, a screen shot only outputting the diffuse component, a screen shot only outputting the specular component, and one using the entire Blinn-Phong model.</p>
+        <td>
+            <img src="images/image18.png" align="middle" width="400px" />
+            <figcaption>Ambient</figcaption>
+        </td>
+        <td>
+            <img src="images/image24.png" align="middle" width="400px" />
+            <figcaption>diffuse</figcaption>
+        </td>
+        <td>
+            <img src="images/image8.png" align="middle" width="400px" />
+            <figcaption>specular</figcaption>
+        </td>
+        <td>
+            <img src="images/image9.png" align="middle" width="400px" />
+            <figcaption>all</figcaption>
+        </td>
+
+
+
+    </div></body>
 </html>
